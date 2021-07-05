@@ -1,6 +1,5 @@
-package com.monnos.database;
+package com.monnos.model;
 
-import com.mongodb.lang.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
           • Terreno : string
           • Para cada planeta também devemos ter a quantidade de aparições em filmes que
           deve ser obtida pela api do Star Wars na inserção do planeta : Int
-   */
+ */
 
 @Document()
 public class Planet {
@@ -24,20 +23,20 @@ public class Planet {
     private String name; //nome do planeta
     private String climate; //clima do planeta
     private String terrain; //terreno do planeta
-    private int films; //total de aparicoes em filmes
+    private int appearances; //total de aparicoes em filmes
 
-    public Planet(String name, String climate, String terrain, Integer films) {
+
+    public Planet( String name, String climate, String terrain) {
         this.name = name;
         this.climate = climate;
         this.terrain = terrain;
-        this.films = films;
     }
 
-    public Planet(String name, String climate, String terrain) {
+    public Planet(String name, String climate, String terrain, int appearances) {
         this.name = name;
         this.climate = climate;
         this.terrain = terrain;
-        this.films = 0;
+        this.appearances = appearances;
     }
 
     public Planet(){
@@ -45,6 +44,10 @@ public class Planet {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -71,12 +74,12 @@ public class Planet {
         this.terrain = terrain;
     }
 
-    public Integer getFilms() {
-        return films;
+    public int getAppearances() {
+        return appearances;
     }
 
-    public void setFilms(Integer films) {
-        this.films = films;
+    public void setAppearances(int appearances) {
+        this.appearances = appearances;
     }
 }
 
