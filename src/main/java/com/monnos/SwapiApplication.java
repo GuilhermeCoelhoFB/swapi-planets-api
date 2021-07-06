@@ -6,6 +6,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+
 	/*
 		   author: github@GuilhermeCoelhoFB
 
@@ -30,6 +31,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @SpringBootApplication
 public class SwapiApplication {
 
+
     @Bean
     public WebClient webClient(WebClient.Builder builder) {
         return builder
@@ -47,34 +49,4 @@ public class SwapiApplication {
 		SpringApplication.run(SwapiApplication.class, args);
 	}
 
-//    @Bean
-//    CommandLineRunner runner(PlanetRepo repo, MongoTemplate mongoTemplate) {
-//        return args -> {
-//            Planet planet = new Planet(
-//                    "MonnosTer",
-//                    "bigode",
-//                    "agua",
-//                    2
-//            );
-//       // repo.save(planet);
-//        };
-//    }
-
-
-
-    // usingMongoTemplateAndQuery(repo, mongoTemplate, planet);
-    // =-------------------------------------=
-//    private void usingMongoTemplateAndQuery(PlanetRepo repo, MongoTemplate mongoTemplate, Planet planet) {
-//        Query query = new Query();
-//        query.addCriteria(Criteria.where("name").is("MonnosRor"));
-//        List<Planet> planets = mongoTemplate.find(query, Planet.class);
-//
-//        if (planets.size() > 1){
-//            throw new IllegalStateException("Too many planets with the same name");
-//        }
-//
-//        if (planets.isEmpty()){
-//            repo.insert(planet);
-//        }
-//    }
 }

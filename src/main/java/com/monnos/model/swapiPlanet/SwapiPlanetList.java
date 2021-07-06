@@ -46,13 +46,6 @@ public class SwapiPlanetList {
         this.results = results;
     }
 
-//    public List<SwapiPlanet> getFilms() {
-//        return films;
-//    }
-//
-//    public void setFilms(List<SwapiPlanet> films) {
-//        this.films = films;
-//    }
 
     public SwapiPlanetList(int count, String next, String previous, List<SwapiPlanet> results) {
         this.count = count;
@@ -65,7 +58,7 @@ public class SwapiPlanetList {
     public String toString() {
         return "Planet{" +
                 "  next='" + next + '\'' +
-                ", previuos='" + previous + '\'' +
+                ", previous='" + previous + '\'' +
                 ", count='" + count + '\'' +
                 ", results='" + results + '\'' +
                 '}';

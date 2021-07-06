@@ -1,18 +1,29 @@
 package com.monnos.service;
 
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.monnos.exception.ApiException;
+import com.monnos.exception.ApiRequestException;
 import com.monnos.model.Planet;
 import com.monnos.model.swapiPlanet.SwapiPlanet;
 import com.monnos.model.swapiPlanet.SwapiPlanetList;
 import com.monnos.repository.PlanetRepo;
 import com.monnos.repository.SwapiPlanetRepo;
+import io.netty.handler.ssl.SslHandshakeTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.timeout.WriteTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClientRequest;
 
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -28,88 +39,133 @@ public class PlanetService {
 
     ///////////////methods
 
-    public List<Planet> getAllPlanets(){
-        return planetRepo.findAll();
-    }
-
-    public Optional<Planet> findByName(String name){
-        return planetRepo.findByName(name);
-    }
-
-    public Optional<Planet> findById(String id){
-        return planetRepo.findById(id);
-    }
-
-    public void deleteById(String id){
-        Optional<Planet> opPlanet = planetRepo.findById(id);
-        if (opPlanet.isPresent()){
-            planetRepo.deleteById(id);
-        }
-        else {
-            throw new NoSuchElementException();
+    public List<Planet> getAllPlanets() throws ApiRequestException {
+        try{
+            if (planetRepo.findAll()!=null)
+                  return planetRepo.findAll();
+            else throw new ApiRequestException("Failed");
+        } catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
         }
     }
 
-    public void addPlanet(Planet planet){
+    public Optional<Planet> findByName(String name) throws ApiRequestException {
+        try {
+            if (planetRepo.findPlanetByName(name).isPresent())
+                return planetRepo.findPlanetByName(name);
 
-        Optional<Planet> planetOptional = planetRepo.findByName(planet.getName().toLowerCase(Locale.ROOT));
-
-        if (planetOptional.isPresent()) {
-            throw new IllegalStateException("Planet taken");
-        } else {
-            SwapiPlanetList planetList;
-            SwapiPlanet swapiPlanet;
-            planetList = this.restTemplate.getForObject(
-                    String.format("https://swapi.dev/api/planets/?search=%s", planet.getName().toLowerCase(Locale.ROOT))
-                    ,SwapiPlanetList.class);
-
-            if (planetList.getCount()==1){
-                swapiPlanet = planetList.getResults().get(0);
-                planet.setAppearances(swapiPlanet.getFilms().size());
-                //salva o planeta com a quantidade de aparicoes em filmes
-                planetRepo.save(planet);
-
-            } else if (planetList.getCount()!=1){
-                planet.setAppearances(0);
-                //retornar excecao que diz que o nome deve ser unico
-                //salva o planeta com as aparicoes zeradas, ja que a busca retornou mais de um planeta
-                planetRepo.save(planet);
-
-            } else throw new NullPointerException();
+            else throw new ApiRequestException("Oops, planet not found");
+        }
+        catch (Exception e){
+            throw new ApiRequestException(e.getMessage());
         }
     }
 
-    public SwapiPlanet findOneSwapiPlanet(String id) throws NullPointerException{
+    public Optional<Planet> findById(String id) throws ApiRequestException {
 
-        Mono<SwapiPlanet> monoSwapiPlanet = this.webClient
-                .get()
-                .uri("planets/{id}", id)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(SwapiPlanet.class);
-        // req async
-        return monoSwapiPlanet.block();
-    }
-
-    public List<SwapiPlanet> getAllSwapiPlanets() {
-        int page = 1;
-        List<SwapiPlanet> swapiAllPlanets = new ArrayList<>();
-        Mono<SwapiPlanetList> monoPlanet;
-        //AQUI TA DANDO TUDO CERTO
-        while(page<=6) {
-            monoPlanet = this.webClient
-                    .get()
-                    .uri("planets/?page=" + page)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(SwapiPlanetList.class);
-            swapiAllPlanets.addAll(monoPlanet.block().getResults());
-            page++;
+        try {
+            Optional<Planet> planet = planetRepo.findById(id);
+            if (planet.isPresent()){
+                return planetRepo.findById(id);
+            }
+            else {
+                throw new ApiRequestException("Oops, planet not found");
+            }
+        } catch (Exception e) {
+            throw new ApiRequestException(e.getMessage());
         }
-        return swapiAllPlanets;
     }
 
-    //Construtor
+    public void deleteById(String id) throws ApiRequestException {
+        try {
+            Optional<Planet> opPlanet = planetRepo.findById(id);
+            if (opPlanet.isPresent()) {
+                planetRepo.deleteById(id);
+            } else {
+                throw new ApiRequestException("Oops, planet not found");
+            }
+        } catch(Exception e){
+            throw new ApiRequestException(e.getMessage());
+        }
+    }
+
+    public void addPlanet(Planet planet) throws ApiRequestException {
+
+        try {
+            Optional<Planet> planetOptional = planetRepo.findPlanetByName(planet.getName().toLowerCase(Locale.ROOT));
+
+            if (planetOptional.isPresent()) {
+                throw new ApiRequestException("Planet taken");
+            } else {
+                SwapiPlanetList planetList;
+                SwapiPlanet swapiPlanet;
+                planetList = this.restTemplate.getForObject(
+                        String.format("https://swapi.dev/api/planets/?search=%s", planet.getName().toLowerCase(Locale.ROOT))
+                        ,SwapiPlanetList.class);
+
+                if (planetList.getCount() == 1) {
+                    swapiPlanet = planetList.getResults().get(0);
+                    planet.setAppearances(swapiPlanet.getFilms().size());
+                    planetRepo.save(planet);
+
+                } else if (planetList.getCount() != 1) {
+                    planet.setAppearances(0);
+
+                    planetRepo.save(planet);
+
+                } else throw new NullPointerException();
+            }
+        } catch (Exception e) {
+            throw new ApiRequestException(e.getMessage());
+        }
+    }
+
+    public SwapiPlanet findOneSwapiPlanet(String id) throws ApiRequestException {
+        try{
+            if (id!=null) {
+                Mono<SwapiPlanet> monoSwapiPlanet = this.webClient
+                        .get()
+                        .uri("planets/{id}", id)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .retrieve()
+                        .bodyToMono(SwapiPlanet.class)
+                        .timeout(Duration.ofMinutes(1));
+                return monoSwapiPlanet.block();
+            }
+            else{
+                throw new ApiRequestException("Oops, invalid ID");
+            }
+        } catch (Exception e) {
+            throw new ApiRequestException("Oops, invalid ID");
+        }
+    }
+
+    public List<SwapiPlanet> getAllSwapiPlanets() throws ApiRequestException {
+        try {
+            int page = 1;
+            List<SwapiPlanet> swapiAllPlanets = new ArrayList<>();
+            Mono<SwapiPlanetList> monoPlanet;
+
+                do {
+                    monoPlanet = this.webClient
+                            .get()
+                            .uri("planets/?page=" + page)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .retrieve()
+                            .bodyToMono(SwapiPlanetList.class);
+
+                    swapiAllPlanets.addAll(monoPlanet.block().getResults());
+                    page++;
+
+                } while (monoPlanet.block().getNext() != null);
+
+                return swapiAllPlanets;
+
+        } catch (Exception e) {
+            throw new ApiRequestException(e.getMessage());
+        }
+    }
+
     public PlanetService(PlanetRepo planetRepo, SwapiPlanetRepo swapiPlanetRepo) {
         this.planetRepo = planetRepo;
         this.swapiPlanetRepo = swapiPlanetRepo;
