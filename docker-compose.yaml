@@ -4,9 +4,9 @@ services:
     image: mongo
     container_name: mongodb
     ports:
-    - 27017:27017
+      - 27017:27017
     volumes:
-    - data:/data
+      - data:/data
     environment:
       - MONGO_INITDB_ROOT_USERNAME=rootuser
       - MONGO_INITDB_ROOT_PASSWORD=rootpass
@@ -19,6 +19,12 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser
       - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
       - ME_CONFIG_MONGODB_SERVER=mongodb
+  swapi-app:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
 volumes:
   data: {}
 networks:

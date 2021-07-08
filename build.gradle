@@ -4,6 +4,11 @@ plugins {
 	id 'java'
 }
 
+bootJar {
+	archiveBaseName = 'swapi-planets'
+	archiveVersion = '0.0.1'
+}
+
 group = 'com.monnos'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
