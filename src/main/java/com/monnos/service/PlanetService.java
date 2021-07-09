@@ -1,28 +1,20 @@
 package com.monnos.service;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.monnos.exception.ApiException;
 import com.monnos.exception.ApiRequestException;
 import com.monnos.model.Planet;
 import com.monnos.model.swapiPlanet.SwapiPlanet;
 import com.monnos.model.swapiPlanet.SwapiPlanetList;
 import com.monnos.repository.PlanetRepo;
 import com.monnos.repository.SwapiPlanetRepo;
-import io.netty.handler.ssl.SslHandshakeTimeoutException;
-import io.netty.handler.timeout.ReadTimeoutException;
-import io.netty.handler.timeout.WriteTimeoutException;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClientRequest;
 
-import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.*;
 
@@ -37,7 +29,6 @@ public class PlanetService {
     @Autowired
     private RestTemplate restTemplate;
 
-    ///////////////methods
 
     public List<Planet> getAllPlanets() throws ApiRequestException {
         try{

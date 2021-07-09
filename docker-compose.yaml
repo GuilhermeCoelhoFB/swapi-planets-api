@@ -1,5 +1,11 @@
 version : "3.8"
 services:
+  swapi-app:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
   mongodb:
     image: mongo
     container_name: mongodb
@@ -19,12 +25,6 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser
       - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
       - ME_CONFIG_MONGODB_SERVER=mongodb
-  swapi-app:
-    build: .
-    ports:
-      - 8080:8080
-    depends_on:
-      - mongodb
 volumes:
   data: {}
 networks:
