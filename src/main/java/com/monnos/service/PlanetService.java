@@ -104,7 +104,7 @@ public class PlanetService {
 
                     planetRepo.save(planet);
 
-                } else throw new NullPointerException("Invalid ID"); throw new ApiRequestException("Invalid ID");
+                } else throw new NullPointerException("Invalid ID");
             }
         } catch (Exception e) {
             throw new ApiRequestException(e.getMessage());
