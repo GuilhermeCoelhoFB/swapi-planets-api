@@ -1,6 +1,6 @@
 ## Swapi Planets with Docker
 Welcome to Swapi-Planets API! In this Application you can Add, Remove and Search by ID/Name (locally added planets or registered planets on [swapi.dev](https://swapi.dev/api/planets/)).
-When adding a planet, if there's a Swapi registered Planet, the number of films appearances will be auto-filled up! 
+When adding a planet, if it's a Swapi registered Planet, the number of films appearances will be auto-filled up! 
 ### How to run this application using Docker:
 
 - <strong>Make sure to have Docker already installed on your computer</strong>, find how to install here: [Docker Hub](https://hub.docker.com)
